@@ -1,0 +1,105 @@
+Using pre-set license
+Built from '2020.3/staging' branch; Version is '2020.3.11f1 (99c7afb366b3) revision 10078127'; Using compiler version '192528614'; Build Type 'Release'
+OS: 'Windows 10 Enterprise LTSC 2019; OS build 17763.4010; Version 1809; 64bit' Language: 'ru' Physical Memory: 16313 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1, IsPro: 0
+
+ COMMAND LINE ARGUMENTS:
+M:\UnityEditors\2020.3.11f1\Editor\Unity.exe
+-adb2
+-batchMode
+-noUpm
+-name
+AssetImportWorker0
+-projectPath
+H:/vikingTestProj/VikingTest
+-logFile
+Logs/AssetImportWorker0.log
+-srvPort
+20724
+Successfully changed project path to: H:/vikingTestProj/VikingTest
+H:/vikingTestProj/VikingTest
+Using Asset Import Pipeline V2.
+Refreshing native plugins compatible for Editor in 28.79 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Initialize engine version: 2020.3.11f1 (99c7afb366b3)
+[Subsystems] Discovering subsystems at path M:/UnityEditors/2020.3.11f1/Editor/Data/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path H:/vikingTestProj/VikingTest/Assets
+GfxDevice: creating device client; threaded=0
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.1]
+    Renderer: NVIDIA GeForce RTX 2070 (ID=0x1f02)
+    Vendor:   
+    VRAM:     8031 MB
+    Driver:   31.0.15.1694
+Initialize mono
+Mono path[0] = 'M:/UnityEditors/2020.3.11f1/Editor/Data/Managed'
+Mono path[1] = 'M:/UnityEditors/2020.3.11f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit'
+Mono config path = 'M:/UnityEditors/2020.3.11f1/Editor/Data/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56940
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: M:/UnityEditors/2020.3.11f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
+Registered in 0.001221 seconds.
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 27.28 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  0.976 seconds
+Platform modules already initialized, skipping
+Registering precompiled user dll's ...
+Registered in 0.003155 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.34 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  0.946 seconds
+Platform modules already initialized, skipping
+========================================================================
+Worker process is ready to serve import requests
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.05 seconds
+Refreshing native plugins compatible for Editor in 0.33 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 1427 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 79.8 MB.
+System memory in use after: 79.9 MB.
+
+Unloading 19 unused Assets to reduce memory usage. Loaded Objects now: 1877.
+Total: 1.936700 ms (FindLiveObjects: 0.152600 ms CreateObjectMapping: 0.046300 ms MarkObjects: 1.615600 ms  DeleteObjects: 0.121100 ms)
+
+========================================================================
+Received Import Request.
+  path: Assets/Viking/Animators/Viking.controller
+  artifactKey: Guid(3c809dffe68080f4ab99207d94b9f6db) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Viking/Animators/Viking.controller using Guid(3c809dffe68080f4ab99207d94b9f6db) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '49566ae0346da270149d6c6034b4dbd5') in 0.050115 seconds
+  Import took 0.056094 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.990071 seconds.
+  path: Assets/Viking/Animators/Viking.controller
+  artifactKey: Guid(3c809dffe68080f4ab99207d94b9f6db) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Viking/Animators/Viking.controller using Guid(3c809dffe68080f4ab99207d94b9f6db) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '49566ae0346da270149d6c6034b4dbd5') in 0.008135 seconds
+  Import took 0.015629 seconds .
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.003197 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.30 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  0.867 seconds
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.29 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 1422 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 79.6 MB.
+System memory in use after: 79.7 MB.
+
+Unloading 14 unused Assets to reduce memory usage. Loaded Objects now: 1880.
+Total: 1.884300 ms (FindLiveObjects: 0.146200 ms CreateObjectMapping: 0.051500 ms MarkObjects: 1.605100 ms  DeleteObjects: 0.080400 ms)
+
+AssetImportWorkerClient::OnTransportError - code=2 error=End of file
