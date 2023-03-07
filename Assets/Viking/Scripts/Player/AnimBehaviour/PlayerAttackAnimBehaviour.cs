@@ -13,6 +13,7 @@ namespace Viking
         override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
             PlayerController.Instance.Animation_ExitAttackState();
+            PlayerController.Instance.AnimationEvent_StopCheckingForHits();
         }
     }
 

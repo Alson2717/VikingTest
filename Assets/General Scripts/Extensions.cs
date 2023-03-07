@@ -13,5 +13,10 @@ public static class Extensions
             && Mathf.Abs(me.y - other.y) < 0.001f
             && Mathf.Abs(me.z - other.z) < 0.001f;
     }
+    public static bool ApproximateEqualsIgnoreY(this Vector3 me, Vector3 other)
+    {
+        return Mathf.Abs(me.x - other.x) < 0.001f
+            && Mathf.Abs(me.z - other.z) < 0.001f;
+    }
 }
 

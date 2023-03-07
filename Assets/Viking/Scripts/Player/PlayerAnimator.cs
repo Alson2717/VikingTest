@@ -31,6 +31,15 @@ namespace Viking
             PlayerController.Instance.OnPlayerAnimatorMove();
         }
 
+        public void AnimationEvent_StartCheckingForHits()
+        {
+            PlayerController.Instance.AnimationEvent_StartCheckingForHits();
+        }
+        public void AnimationEvent_StopCheckingForHits()
+        {
+            PlayerController.Instance.AnimationEvent_StopCheckingForHits();
+        }
+
         #region Editor
         private void Reset()
         {

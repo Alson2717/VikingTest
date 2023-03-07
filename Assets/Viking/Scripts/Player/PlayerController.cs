@@ -15,6 +15,8 @@ namespace Viking
         private PlayerAnimator animator;
         [SerializeField]
         private new Rigidbody rigidbody;
+        [SerializeField]
+        private SphereCollider attackCollider;
 
         [Header("Animations")]
         [SerializeField]
@@ -39,10 +41,6 @@ namespace Viking
         [Header("Settings")]
         [SerializeField]
         private float rotationSpeed = 0.25f;
-        [SerializeField]
-        private float minSprintSpeed = 1.0f;
-        [SerializeField]
-        private float maxSprintSpeed = 1.5f;
         #endregion
 
         #region Animations
@@ -59,6 +57,9 @@ namespace Viking
         private bool isAttacking = false;
         private bool isDamaged = false;
         private bool isDead = false;
+
+        private bool checkForHits = false;
+        private HashSet<EnemyController> hits;
         protected override void SingletonAwake()
         {
             runID = Animator.StringToHash(runName);
@@ -73,16 +74,48 @@ namespace Viking
 
         private void Update()
         {
+            HandleCheckingForHits();
+
             if (IgnoreInput())
                 return;
 
             HandleMovementInput();
             HandleOtherInput();
-        }
-        private void FixedUpdate()
-        {
+
             rigidbody.MovePosition(rigidbody.position + accMovement);
             accMovement = new Vector3();
+        }
+
+        private void HandleCheckingForHits()
+        {
+            if (!checkForHits)
+                return;
+
+            Vector3 position = attackCollider.bounds.center;
+            float radius = attackCollider.radius;
+
+            Collider[] colliders = Physics.OverlapSphere(position, radius,
+                GameController.Instance.EnemyHitboxLayer);
+            foreach (Collider collider in colliders)
+            {
+                CheckForHitboxAndRegisterHit(collider);
+            }
+        }
+        private bool CheckForHitboxAndRegisterHit(Collider collider)
+        {
+            EnemyHitbox hitbox = collider.GetComponent<EnemyHitbox>();
+            if (hitbox == null || !hitbox.ShouldRegisterHit())
+                return false;
+            return RegisterEnemyHit(hitbox.LinkedEnemy);
+        }
+        public bool RegisterEnemyHit(EnemyController enemy)
+        {
+            if(hits.Add(enemy))
+            {
+                enemy.ReceiveHit(1);
+                return true;
+            }
+            return false;
         }
 
         private void HandleMovementInput()
@@ -158,30 +191,39 @@ namespace Viking
                 }
             }
 
-            if(Input.GetKeyDown(KeyCode.Space))
-            {
-                TakeDamage(1);
-            }
-            if(Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                Die();
-            }
+            //if(Input.GetKeyDown(KeyCode.Space))
+            //{
+            //    ReceiveHit(1);
+            //}
+            //if(Input.GetKeyDown(KeyCode.Alpha1))
+            //{
+            //    Die();
+            //}
         }
 
-        private bool IgnoreInput()
+        public bool IgnoreInput()
         {
             return isDead;
         }
-        private bool CanAttack()
+        public bool CanAttack()
         {
             return !isAttacking && !isDamaged;
         }
-        private bool CanMove()
+        public bool CanMove()
         {
             return true;
         }
+        public bool CanReceiveHit()
+        {
+            return !IsDead();
+        }
 
-        public void TakeDamage(int amount)
+        public bool IsDead()
+        {
+            return isDead;
+        }
+
+        public void ReceiveHit(int amount)
         {
             animator.animator.SetTrigger(damagedID);
         }
@@ -218,8 +260,23 @@ namespace Viking
         }
         #endregion
 
+        #region Animation Event
+        public void AnimationEvent_StartCheckingForHits()
+        {
+            hits = new HashSet<EnemyController>();
+            checkForHits = true;
+        }
+        public void AnimationEvent_StopCheckingForHits()
+        {
+            checkForHits = false;
+        }
+        #endregion
+
         public void OnPlayerAnimatorMove()
         {
+            // doing it like this so its easier to switch to different
+            // places for actual update, e.i. if i want to switch position
+            // update to FixedUpdate instead of animatorMove or some other place
             accMovement += animator.animator.deltaPosition;
         }
     }

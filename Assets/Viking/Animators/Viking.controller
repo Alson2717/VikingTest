@@ -88,7 +88,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Damage
-  m_Speed: 2
+  m_Speed: 1.5
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 851040721485506835}
@@ -181,7 +181,7 @@ AnimatorState:
   m_TimeParameterActive: 0
   m_Motion: {fileID: -203655887218126122, guid: b591c53abde4fc74b8e01fd61bc10930, type: 3}
   m_Tag: 
-  m_SpeedParameter: 
+  m_SpeedParameter: Sprint
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
