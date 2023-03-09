@@ -181,7 +181,7 @@ MonoBehaviour:
   spawnRadius: 30
   startingAmountOfEnemies: 10
   startingSpawnDelay: 2
-  healthGlobeChance: 100
+  healthGlobeChance: 30
   enemies: []
 --- !u!1 &70060678
 GameObject:

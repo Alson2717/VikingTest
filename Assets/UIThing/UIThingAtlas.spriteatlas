@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: UIThingAtlas
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 3
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 1
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 1
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 102900000, guid: ae51b7a5db5d5624b9bd9ebfbd60fac9, type: 3}
+    totalSpriteSurfaceArea: 2860145
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: e05e9622c162dfc4291c9b043154cee6, type: 3}
+  - {fileID: 21300000, guid: d8e733655c7e9894688eb2339c20bd5b, type: 3}
+  - {fileID: 21300000, guid: bd82976a59112db4a88330a147a42824, type: 3}
+  - {fileID: 21300000, guid: e542b07c1a7510f49b72f0703347dc27, type: 3}
+  - {fileID: 21300000, guid: 0bbc107fd4e9ff84e8592d349d82f1d9, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - home
+  - SettingPanel
+  - button green long
+  - big star
+  - wall
+  m_RenderDataMap: {}
+  m_Tag: UIThingAtlas
+  m_IsVariant: 0
