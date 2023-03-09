@@ -223,6 +223,12 @@ namespace Viking
             return isDead;
         }
 
+        public void Heal(int amount)
+        {
+            currentHealth += amount;
+            currentHealth = Mathf.Min(currentHealth, maxHealth);
+            PlayerUI.Instance.SetHealthBarPercentage(CalcHealthPerc());
+        }
         public void ReceiveHit(int amount)
         {
             currentHealth -= amount;

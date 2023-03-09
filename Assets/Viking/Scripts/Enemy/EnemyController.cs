@@ -63,7 +63,8 @@ namespace Viking
             get { return this.obstacle; }
         }
 
-        private int maxHealth = 1;
+        private int extraMaxHealth = 0;
+        private int maxHealth;
         private int health;
 
         private bool isAttacking = false;
@@ -74,8 +75,6 @@ namespace Viking
         private int currentPathIndex = -1;
         private Vector3 currentPathPosition;
 
-        private int frame = 0;
-
         private bool checkForHits = false;
         private bool hitPlayer = false;
         private void Awake()
@@ -84,17 +83,37 @@ namespace Viking
             damagedID = Animator.StringToHash(damagedName);
             attackID = Animator.StringToHash(attackName);
             deathID = Animator.StringToHash(deathName);
-
-            maxHealth = startingMaxHealth;
-            health = startingMaxHealth;
-            ui.SetHealthbarPerc(CalcHealthPerc());
         }
         private void Start()
         {
+            EnemyHivemind.Instance.enemies.Add(this);
+            ui.Canvas.worldCamera = CameraController.Instance.Camera;
+        }
+
+        public void ResetSelf(int extraHealth)
+        {
+            gameObject.SetActive(true);
+
+            ui.EnableSelf();
+
+            solidCollider.enabled = true;
+
             agent.updatePosition = false;
             agent.updateRotation = false;
 
-            EnemyHivemind.Instance.enemies.Add(this);
+            obstacle.enabled = false;
+            agent.enabled = true;
+
+            extraMaxHealth = extraHealth;
+            maxHealth = startingMaxHealth + extraHealth;
+            health = maxHealth;
+            ui.SetHealthbarPerc(CalcHealthPerc());
+
+            isAttacking = false;
+            isDamaged = false;
+            isDead = false;
+
+            animator.animator.SetBool(deathID, false);
 
             SetDestination(PlayerController.Instance.transform);
         }
@@ -115,7 +134,7 @@ namespace Viking
 
             Vector3 currentPosition = transform.position;
             Quaternion currentRotation = transform.rotation;
-
+            
             if (CanAttack())
             {
                 Vector3 targetPosition = player.transform.position;
@@ -231,6 +250,10 @@ namespace Viking
         {
             return !IsDead() && !isAttacking;
         }
+        public bool ShouldCallUpdate()
+        {
+            return !IsDead();
+        }
 
         public bool IsDead()
         {
@@ -257,7 +280,18 @@ namespace Viking
         public void Die()
         {
             PlayerUI.Instance.IncreaseScore(1);
+
+            EnemyHivemind.Instance.SpawnEnemy(extraMaxHealth + healthIncrease);
+            Vector3 healthGlobePosition = transform.position;
+            healthGlobePosition.y += 0.8f;
+            EnemyHivemind.Instance.TrySpawnHealthGlobe(healthGlobePosition);
+
             animator.animator.SetBool(deathID, true);
+
+            ui.DisableSelf();
+            solidCollider.enabled = false;
+
+            StartCoroutine(AddToPoolAfterTime(5.0f));
         }
 
         public float CalcHealthPerc()
@@ -305,17 +339,11 @@ namespace Viking
         public void Animation_SetAttackState()
         {
             isAttacking = true;
-
-            agent.enabled = false;
-            obstacle.enabled = true;
         }
         public void Animation_ExitAttackState()
         {
             isAttacking = false;
             AnimationEvent_StopCheckingForHits();
-
-            agent.enabled = true;
-            obstacle.enabled = false;
         }
 
         public void Animation_SetDamagedState()
@@ -330,16 +358,21 @@ namespace Viking
         public void Animation_SetDeadState()
         {
             isDead = true;
-            solidCollider.enabled = false;
-
-            ui.DisableCanvas();
         }
         public void Animation_ExitDeadState()
         {
             isDead = false;
-            solidCollider.enabled = true;
+        }
+        #endregion
 
-            ui.EnableCanvas();
+        #region Coroutines
+        private IEnumerator AddToPoolAfterTime(float time)
+        {
+            yield return new WaitForSeconds(time);
+
+            gameObject.SetActive(false);
+
+            EnemyHivemind.Instance.enemyPool.Add(this);
         }
         #endregion
     }

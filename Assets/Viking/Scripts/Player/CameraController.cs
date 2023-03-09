@@ -110,8 +110,8 @@ namespace Viking
                     continue;
 
                 // very simplistic, in a real project should calculate
-                // position on screen with bounds and draw it flat with no rotation
-                // for this will do tho i think
+                // position on screen with bounds and draw it flat with no transformation
+                // for this will do tho
                 Vector3 lookPosition = look.transform.position;
                 lookPosition.y = finalPosition.y;
                 Vector3 dir = finalPosition - lookPosition;
