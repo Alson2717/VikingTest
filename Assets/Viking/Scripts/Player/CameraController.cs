@@ -48,6 +48,8 @@ namespace Viking
             set { lookAtTarget = value; }
         }
 
+        public List<LookAtCamera> lookAtCamera = new List<LookAtCamera>();
+
         private Vector3 euler;
         private float prevEulerX;
 
@@ -100,6 +102,21 @@ namespace Viking
 
             Quaternion finalRotation = CalcTargetRotation(finalPosition);
             transform.SetPositionAndRotation(finalPosition, finalRotation);
+
+
+            foreach (LookAtCamera look in lookAtCamera)
+            {
+                if (!look.enabled || !look.gameObject.activeSelf)
+                    continue;
+
+                // very simplistic, in a real project should calculate
+                // position on screen with bounds and draw it flat with no rotation
+                // for this will do tho i think
+                Vector3 lookPosition = look.transform.position;
+                lookPosition.y = finalPosition.y;
+                Vector3 dir = finalPosition - lookPosition;
+                look.transform.rotation = Quaternion.LookRotation(dir);
+            }
         }
 
         private Quaternion CalcTargetRotation(Vector3 currentPos)

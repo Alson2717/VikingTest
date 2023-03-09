@@ -64,7 +64,7 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.43309605
+      - time: 0.4843328
         functionName: AnimationEvent_StartCheckingForHits
         data: 
         objectReferenceParameter: {instanceID: 0}

@@ -12,11 +12,15 @@ namespace Viking
         [SerializeField]
         private NavMeshAgent agent;
         [SerializeField]
+        private NavMeshObstacle obstacle;
+        [SerializeField]
         private EnemyAnimator animator;
         [SerializeField]
         private Collider solidCollider;
         [SerializeField]
         private SphereCollider attackCollider;
+        [SerializeField]
+        private EnemyUI ui;
 
         [Header("Animations")]
         [SerializeField]
@@ -37,6 +41,10 @@ namespace Viking
         private float attackRadius = 1.0f;
         [SerializeField]
         private float attackDot = 0.5f;
+        [SerializeField]
+        private int startingMaxHealth = 1;
+        [SerializeField]
+        private int healthIncrease = 1;
         #endregion
 
         #region Animation
@@ -46,7 +54,17 @@ namespace Viking
         private int deathID;
         #endregion
 
-        private int health = 5;
+        public NavMeshAgent Agent
+        {
+            get { return this.agent; }
+        }
+        public NavMeshObstacle Obstacle
+        {
+            get { return this.obstacle; }
+        }
+
+        private int maxHealth = 1;
+        private int health;
 
         private bool isAttacking = false;
         private bool isDamaged = false;
@@ -66,18 +84,31 @@ namespace Viking
             damagedID = Animator.StringToHash(damagedName);
             attackID = Animator.StringToHash(attackName);
             deathID = Animator.StringToHash(deathName);
+
+            maxHealth = startingMaxHealth;
+            health = startingMaxHealth;
+            ui.SetHealthbarPerc(CalcHealthPerc());
         }
         private void Start()
         {
             agent.updatePosition = false;
             agent.updateRotation = false;
 
+            EnemyHivemind.Instance.enemies.Add(this);
+
             SetDestination(PlayerController.Instance.transform);
         }
 
-        private void Update()
+        public void ManualUpdate()
         {
-            if(checkForHits)
+            PlayerController player = PlayerController.Instance;
+            if (player.IsDead())
+            {
+                animator.animator.SetBool(runID, false);
+                return;
+            }
+
+            if (checkForHits)
             {
                 CheckForHits();
             }
@@ -87,28 +118,28 @@ namespace Viking
 
             if (CanAttack())
             {
-                Vector3 targetPosition = PlayerController.Instance.transform.position;
+                Vector3 targetPosition = player.transform.position;
                 Vector3 dir = targetPosition - currentPosition;
                 Vector3 dirn = dir.normalized;
-
-                Vector3 forward = transform.forward;
-                float dot = Vector3.Dot(dirn, forward);
-
-                if (dot < attackDot)
-                {
-                    animator.animator.SetBool(runID, true);
-                    transform.rotation = GetSmoothRotation(currentRotation, dir);
-                    return;
-                }
 
                 float distance = Vector3.Distance(currentPosition, targetPosition);
 
                 if (distance <= attackRadius)
                 {
-                    Attack();
+                    Vector3 forward = transform.forward;
+                    float dot = Vector3.Dot(dirn, forward);
+
+                    if (dot < attackDot)
+                    {
+                        animator.animator.SetBool(runID, true);
+                        transform.rotation = GetSmoothRotation(currentRotation, dir);
+                    }
+                    else
+                    {
+                        Attack();
+                    }
                     return;
                 }
-
             }
 
             if (!CanMove() || IsPathDone())
@@ -120,14 +151,6 @@ namespace Viking
             currentPosition.y = 0.0f;
             Vector3 targetPathPosition = currentPathPosition;
             targetPathPosition.y = currentPosition.y;
-
-            frame++;
-            if (frame == 10)
-            {
-                // recalculate path from time to time
-                SetDestination(PlayerController.Instance.transform);
-                frame = 0;
-            }
 
             animator.animator.SetBool(runID, true);
 
@@ -165,6 +188,8 @@ namespace Viking
 
         private Quaternion GetSmoothRotation(Quaternion current, Vector3 direction)
         {
+            if (direction.ApproximateEquals(new Vector3(0.0f, 0.0f, 0.0f)))
+                return current;
             Quaternion target = Quaternion.LookRotation(direction);
             return Quaternion.Slerp(current, target, rotationSpeed * Time.deltaTime);
         }
@@ -178,8 +203,6 @@ namespace Viking
                 GameController.Instance.PlayerHitboxLayer);
             foreach (Collider collider in colliders)
             {
-                Debug.Log(collider.name, collider.gameObject);
-
                 PlayerHitbox hitbox = collider.GetComponent<PlayerHitbox>();
                 if(hitbox != null && hitbox.ShouldRegisterHit())
                 {
@@ -204,6 +227,11 @@ namespace Viking
             return !isAttacking && !isDamaged && !isDead;
         }
 
+        public bool ShouldRecalculatePath()
+        {
+            return !IsDead() && !isAttacking;
+        }
+
         public bool IsDead()
         {
             return isDead;
@@ -216,6 +244,7 @@ namespace Viking
         public void ReceiveHit(int damage)
         {
             health -= damage;
+            ui.SetHealthbarPerc(CalcHealthPerc());
             if (health <= 0)
             {
                 Die();
@@ -227,7 +256,13 @@ namespace Viking
         }
         public void Die()
         {
+            PlayerUI.Instance.IncreaseScore(1);
             animator.animator.SetBool(deathID, true);
+        }
+
+        public float CalcHealthPerc()
+        {
+            return (float)health / (float)maxHealth;
         }
 
         #region Animation Event
@@ -251,7 +286,10 @@ namespace Viking
             position.y = terrain.GetPosition().y + terrain.SampleHeight(position);
 
             NavMeshPath path = new NavMeshPath();
+            bool agentState = agent.enabled;
+            agent.enabled = true;
             agent.CalculatePath(position, path);
+            agent.enabled = agentState;
 
             if(path.status == NavMeshPathStatus.PathComplete)
             {
@@ -267,11 +305,17 @@ namespace Viking
         public void Animation_SetAttackState()
         {
             isAttacking = true;
+
+            agent.enabled = false;
+            obstacle.enabled = true;
         }
         public void Animation_ExitAttackState()
         {
             isAttacking = false;
             AnimationEvent_StopCheckingForHits();
+
+            agent.enabled = true;
+            obstacle.enabled = false;
         }
 
         public void Animation_SetDamagedState()
@@ -287,11 +331,15 @@ namespace Viking
         {
             isDead = true;
             solidCollider.enabled = false;
+
+            ui.DisableCanvas();
         }
         public void Animation_ExitDeadState()
         {
             isDead = false;
             solidCollider.enabled = true;
+
+            ui.EnableCanvas();
         }
         #endregion
     }

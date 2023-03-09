@@ -41,6 +41,8 @@ namespace Viking
         [Header("Settings")]
         [SerializeField]
         private float rotationSpeed = 0.25f;
+        [SerializeField]
+        private int maxHealth = 20;
         #endregion
 
         #region Animations
@@ -60,18 +62,25 @@ namespace Viking
 
         private bool checkForHits = false;
         private HashSet<EnemyController> hits;
+
+        private int currentHealth;
         protected override void SingletonAwake()
         {
             runID = Animator.StringToHash(runName);
             attackID = Animator.StringToHash(attackName);
             damagedID = Animator.StringToHash(damagedName);
             deathID = Animator.StringToHash(deathName);
+
+            currentHealth = maxHealth;
         }
         protected override void SingletonDestroy()
         {
             
         }
-
+        private void Start()
+        {
+            PlayerUI.Instance.SetHealthBarPercentage(CalcHealthPerc());
+        }
         private void Update()
         {
             HandleCheckingForHits();
@@ -190,15 +199,6 @@ namespace Viking
                     animator.animator.SetTrigger(attackID);
                 }
             }
-
-            //if(Input.GetKeyDown(KeyCode.Space))
-            //{
-            //    ReceiveHit(1);
-            //}
-            //if(Input.GetKeyDown(KeyCode.Alpha1))
-            //{
-            //    Die();
-            //}
         }
 
         public bool IgnoreInput()
@@ -225,12 +225,26 @@ namespace Viking
 
         public void ReceiveHit(int amount)
         {
-            animator.animator.SetTrigger(damagedID);
+            currentHealth -= amount;
+            PlayerUI.Instance.SetHealthBarPercentage(CalcHealthPerc());
+            if(currentHealth <= 0)
+            {
+                Die();
+            }
+            else
+            {
+                animator.animator.SetTrigger(damagedID);
+            }
         }
         public void Die()
         {
             animator.animator.SetLayerWeight(1, 0.0f);
             animator.animator.SetBool(deathID, true);
+        }
+
+        public float CalcHealthPerc()
+        {
+            return (float)currentHealth / (float)maxHealth;
         }
 
         #region Animation
