@@ -138,11 +138,6 @@ namespace Viking
         {
             if (IsReseting())
                 return;
-
-            // light is wrong after reset but only in editor
-            // light is fine in builds
-            // dont know how to fix, but i also do not care
-            // since its wrong only in editor
             blackScreenCoroutine.Start(ResetGameCoroutine(blackScreenTime));
         }
         public void Button_ExitGame()
