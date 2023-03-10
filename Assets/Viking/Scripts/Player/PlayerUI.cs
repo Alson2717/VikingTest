@@ -38,6 +38,10 @@ namespace Viking
             currentScore++;
             UpdateScoreText();
         }
+        public int GetScore()
+        {
+            return currentScore;
+        }
 
         public void UpdateScoreText()
         {

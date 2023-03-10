@@ -14,6 +14,14 @@ namespace Viking
         [SerializeField]
         private new Camera camera;
 
+        [Header("Start Game Settings")]
+        [SerializeField]
+        private Transform startGameTarget;
+        [SerializeField]
+        private float startGameSpeed = 10.0f;
+        [SerializeField]
+        private Vector3 startGameOffset = new Vector3(0.0f, 10.0f, -5.0f);
+
         [Header("Settings")]
         [SerializeField]
         private Transform offsetTarget;
@@ -54,6 +62,10 @@ namespace Viking
         private float prevEulerX;
 
         private float zoom = 0.0f;
+
+        private bool followPlayer = false;
+
+        public bool ignoreInput = false;
         protected override void SingletonAwake()
         {
             
@@ -62,16 +74,50 @@ namespace Viking
         {
            
         }
+        private void Start()
+        {
+            Vector3 position = startGameTarget.position + startGameOffset;
+            Quaternion rotation = CalcStartGameRotation(position);
+            transform.SetPositionAndRotation(position, rotation);
+        }
 
         private void LateUpdate()
         {
-            euler.y += Input.GetAxis("Mouse X") * rotationSpeed;
-            euler.x += Input.GetAxis("Mouse Y") * rotationSpeed;
+            if(followPlayer)
+            {
+                if (ignoreInput)
+                    return;
 
-            zoom -= Input.GetAxis("Mouse ScrollWheel");
-            zoom = Mathf.Clamp(zoom, 0.0f, 1.0f);
+                euler.y += Input.GetAxis("Mouse X") * rotationSpeed;
+                euler.x += Input.GetAxis("Mouse Y") * rotationSpeed;
 
-            CameraController.Instance.ManualUpdate(Time.deltaTime);
+                zoom -= Input.GetAxis("Mouse ScrollWheel");
+                zoom = Mathf.Clamp(zoom, 0.0f, 1.0f);
+
+                this.ManualUpdate(Time.deltaTime);
+            }
+            else
+            {
+                StartGameUpdate();
+            }
+        }
+
+        public void SwitchToPlayerFollowing()
+        {
+            followPlayer = true;
+        }
+
+        private void StartGameUpdate()
+        {
+            Vector3 right = transform.right;
+            right.y = 0.0f;
+            right.Normalize();
+
+            Vector3 currentPosition = transform.position;
+            currentPosition += right * startGameSpeed * Time.deltaTime;
+
+            Quaternion rotation = CalcStartGameRotation(currentPosition);
+            transform.SetPositionAndRotation(currentPosition, rotation);
         }
 
         public void ManualUpdate(float deltaTime)
@@ -119,6 +165,11 @@ namespace Viking
             }
         }
 
+        private Quaternion CalcStartGameRotation(Vector3 currentPos)
+        {
+            Vector3 lookat = startGameTarget.transform.position;
+            return Quaternion.LookRotation(lookat - currentPos);
+        }
         private Quaternion CalcTargetRotation(Vector3 currentPos)
         {
             Vector3 lookat = lookAtTarget.transform.position;

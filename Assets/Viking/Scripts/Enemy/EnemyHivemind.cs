@@ -1,8 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Viking
@@ -42,6 +39,8 @@ namespace Viking
         public Pool<EnemyController> enemyPool = new Pool<EnemyController>();
         [HideInInspector]
         public Pool<HealthGlobe> healthGlobesPool = new Pool<HealthGlobe>();
+
+        private bool gameBegan = false;
         protected override void SingletonAwake()
         {
             
@@ -49,10 +48,6 @@ namespace Viking
         protected override void SingletonDestroy()
         {
            
-        }
-        private void Start()
-        {
-            StartCoroutine(SpawnEnemiesCoroutine(startingSpawnDelay, startingAmountOfEnemies));
         }
         private void Update()
         {
@@ -70,9 +65,15 @@ namespace Viking
                     enemy.Agent.enabled = false;
                     enemy.Obstacle.enabled = true;
                 }
+
+                Transform target = null;
+                if (gameBegan)
+                    target = PlayerController.Instance.transform;
+                else
+                    target = spawnPoints.Random();
                 // doing like this cz i have no idea how to force update navmesh
                 // other then using third party thing or making my own
-                StartCoroutine(UpdateDestinationNextFrame(current));
+                StartCoroutine(UpdateDestinationNextFrame(current, target));
 
                 currentFrame = 0;
             }
@@ -82,8 +83,21 @@ namespace Viking
             foreach (EnemyController enemy in enemies)
             {
                 if(enemy.ShouldCallUpdate())
-                    enemy.ManualUpdate();
+                    enemy.ManualUpdate(!gameBegan);
             }
+        }
+
+        public void StartGame()
+        {
+            foreach (EnemyController enemy in enemies)
+            {
+                enemy.DisableAndAddToPool();
+            }
+
+            this.StopAllCoroutines();
+
+            StartCoroutine(SpawnEnemiesCoroutine(startingSpawnDelay, startingAmountOfEnemies));
+            gameBegan = true;
         }
 
         public void SpawnEnemy(int extraHealth)
@@ -126,24 +140,11 @@ namespace Viking
             healthGlobe.ResetSelf();
         }
 
-        private void OnDrawGizmos()
-        {
-            Transform player = FindObjectOfType<PlayerController>().transform;
-
-            Vector3 forward = player.forward;
-            forward.y = 0.0f;
-            forward.Normalize();
-
-            Vector3 playerPosition = player.position;
-            Vector3 radius = playerPosition + forward * spawnRadius;
-
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(playerPosition, radius);
-        }
-
         private EnemyController GetEnemyToSetPath()
         {
             int maxIndex = enemies.Count - 1;
+            if (maxIndex < 0)
+                return null;
             lastEnemyIndex = Mathf.Min(lastEnemyIndex, maxIndex);
 
             // doing this instead of while(true) to prevent potential softlock
@@ -172,10 +173,10 @@ namespace Viking
                 yield return new WaitForSeconds(delay);
             }
         }
-        private IEnumerator UpdateDestinationNextFrame(EnemyController current)
+        private IEnumerator UpdateDestinationNextFrame(EnemyController current, Transform target)
         {
             yield return null;
-            current.SetDestination(PlayerController.Instance.transform);
+            current.SetDestination(target);
             foreach (EnemyController enemy in enemies)
             {
                 if (current == enemy)

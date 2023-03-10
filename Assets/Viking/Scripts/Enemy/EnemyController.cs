@@ -86,8 +86,17 @@ namespace Viking
         }
         private void Start()
         {
+            agent.updatePosition = false;
+            agent.updateRotation = false;
+
             EnemyHivemind.Instance.enemies.Add(this);
             ui.Canvas.worldCamera = CameraController.Instance.Camera;
+
+            Terrain terrain = GameController.Instance.Terrain;
+
+            Vector3 position = transform.position;
+            position.y = terrain.SampleHeight(position) + terrain.GetPosition().y;
+            transform.position = position;
         }
 
         public void ResetSelf(int extraHealth)
@@ -97,9 +106,6 @@ namespace Viking
             ui.EnableSelf();
 
             solidCollider.enabled = true;
-
-            agent.updatePosition = false;
-            agent.updateRotation = false;
 
             obstacle.enabled = false;
             agent.enabled = true;
@@ -118,10 +124,10 @@ namespace Viking
             SetDestination(PlayerController.Instance.transform);
         }
 
-        public void ManualUpdate()
+        public void ManualUpdate(bool ignorePlayer)
         {
             PlayerController player = PlayerController.Instance;
-            if (player.IsDead())
+            if (!ignorePlayer && player.IsDead())
             {
                 animator.animator.SetBool(runID, false);
                 return;
@@ -135,7 +141,7 @@ namespace Viking
             Vector3 currentPosition = transform.position;
             Quaternion currentRotation = transform.rotation;
             
-            if (CanAttack())
+            if (!ignorePlayer && CanAttack())
             {
                 Vector3 targetPosition = player.transform.position;
                 Vector3 dir = targetPosition - currentPosition;
@@ -248,11 +254,11 @@ namespace Viking
 
         public bool ShouldRecalculatePath()
         {
-            return !IsDead() && !isAttacking;
+            return !IsDead() && !isAttacking && gameObject.activeSelf;
         }
         public bool ShouldCallUpdate()
         {
-            return !IsDead();
+            return !IsDead() && gameObject.activeSelf;
         }
 
         public bool IsDead()
@@ -365,14 +371,17 @@ namespace Viking
         }
         #endregion
 
+        public void DisableAndAddToPool()
+        {
+            gameObject.SetActive(false);
+            EnemyHivemind.Instance.enemyPool.Add(this);
+        }
+
         #region Coroutines
         private IEnumerator AddToPoolAfterTime(float time)
         {
             yield return new WaitForSeconds(time);
-
-            gameObject.SetActive(false);
-
-            EnemyHivemind.Instance.enemyPool.Add(this);
+            DisableAndAddToPool();
         }
         #endregion
     }

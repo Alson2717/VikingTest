@@ -95,6 +95,15 @@ namespace Viking
             accMovement = new Vector3();
         }
 
+        public void EnableSelf()
+        {
+            gameObject.SetActive(true);
+        }
+        public void DisableSelf()
+        {
+            gameObject.SetActive(false);
+        }
+
         private void HandleCheckingForHits()
         {
             if (!checkForHits)
@@ -246,6 +255,9 @@ namespace Viking
         {
             animator.animator.SetLayerWeight(1, 0.0f);
             animator.animator.SetBool(deathID, true);
+
+            CameraController.Instance.ignoreInput = true;
+            GameController.Instance.ShowEndGameUI(PlayerUI.Instance.GetScore());
         }
 
         public float CalcHealthPerc()
